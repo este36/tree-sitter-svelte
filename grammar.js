@@ -138,7 +138,11 @@ module.exports = grammar(HTML, {
       '}',
     ),
 
-    _else_if_tag: _ => tag(':', 'else if'),
+    // Since 'else' and 'if' are separated by space, we cannot put them in a simple tag() like $._else_tag or $._if_start_tag
+    _else_if_tag: $ => seq(
+      tag(':', 'else'),
+      field('tag', 'if'),
+    ),
     else_if_start: $ => seq(
       '{',
       alias($._else_if_tag, $.block_tag),
