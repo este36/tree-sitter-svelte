@@ -138,14 +138,10 @@ module.exports = grammar(HTML, {
       '}',
     ),
 
-    // Since 'else' and 'if' are separated by space, we cannot put them in a simple tag() like $._else_tag or $._if_start_tag
-    else_if_tag: $ => seq(
-      tag(':', 'else'),
-      field('tag', 'if'),
-    ),
+    _else_if_tag: _ => tag(':', 'else', 'if'),
     else_if_start: $ => seq(
       '{',
-      alias($.else_if_tag, $.block_tag),
+      alias($._else_if_tag, $.block_tag),
       field('condition', $.svelte_raw_text),
       '}',
     ),
@@ -312,11 +308,13 @@ module.exports = grammar(HTML, {
 /**
  * @param  {string} sym
  * @param  {string} text
+ * @rest param {string} ...other
  * @return {SeqRule}
  */
-function tag(sym, text) {
+function tag(sym, text, ...other) {
   return seq(
     sym,
     field('tag', token.immediate(text)),
+    ...other.map(rule => field('tag', rule)),
   );
 }
